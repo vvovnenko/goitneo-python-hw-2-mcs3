@@ -28,20 +28,38 @@ def validate_args(args: list, args_types: list) -> list:
         result.append(value)
     return result
 
+def input_error(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValueError as e:
+            return f'Input error: {e}'
+        except IndexError:
+            return 'Incorrect index'
+        except KeyError:
+            return 'Incorrect key'
 
-def add_contact(name: str, phone: str, contacts: dict) -> str:
+    return inner
+
+@input_error
+def add_contact(args: list, contacts: dict) -> str:
+    name, phone = validate_args(args, [ARG_NAME, ARG_PHONE])
     if name in contacts:
         return "Contact already exists. Use 'change' command"
     contacts[name] = phone
     return "Contact added."
 
-def change_contact(name: str, phone: str, contacts: dict) -> str:
+@input_error
+def change_contact(args: list, contacts: dict) -> str:
+    name, phone = validate_args(args, [ARG_NAME, ARG_PHONE])
     if name not in contacts:
         return "Contact does not exist. Use 'add' command"
     contacts[name] = phone
     return "Contact updated."
 
-def get_contact(name: str, contacts: dict) -> str:
+@input_error
+def get_contact(args: list, contacts: dict) -> str:
+    name = validate_args(args, [ARG_NAME])
     if name not in contacts:
         return "Contact does not exist"
     return contacts[name]
@@ -61,30 +79,21 @@ def main():
         output = ''
         exit = False
 
-        try:
-            if command in ["close", "exit"]:
-                output = "Good bye!"
-                exit = True
-            elif command == "hello":
-                output = "How can I help you?"
-            elif command == "add":
-                output = add_contact(
-                    *validate_args(args, [ARG_NAME, ARG_PHONE]),
-                    contacts)
-            elif command == "change":
-                output = change_contact(
-                    *validate_args(args, [ARG_NAME, ARG_PHONE]),
-                    contacts)
-            elif command == "phone":
-                output = get_contact(
-                    *validate_args(args, [ARG_NAME]),
-                    contacts)
-            elif command == "all":
-                output = get_all(contacts)
-            else:
-                output = "Invalid command."
-        except ValueError as e:
-            output = f'Input error: {e}'
+        if command in ["close", "exit"]:
+            output = "Good bye!"
+            exit = True
+        elif command == "hello":
+            output = "How can I help you?"
+        elif command == "add":
+            output = add_contact(args, contacts)
+        elif command == "change":
+            output = change_contact(args, contacts)
+        elif command == "phone":
+            output = get_contact(args, contacts)
+        elif command == "all":
+            output = get_all(contacts)
+        else:
+            output = "Invalid command."
         
         print(output)
 
