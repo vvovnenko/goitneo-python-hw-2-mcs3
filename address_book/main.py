@@ -41,7 +41,7 @@ class Record:
     def edit_phone(self, old_phone:str, new_phone:str):
         item = self.find_phone(old_phone)
         if item:
-            item.value = new_phone
+            self.phones[self.phones.index(item)] = Phone(new_phone)
 
 
     def __str__(self):
