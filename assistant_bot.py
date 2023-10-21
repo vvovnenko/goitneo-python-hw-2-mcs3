@@ -67,7 +67,8 @@ def get_contact(args: list, contacts: dict) -> str:
 def get_all(contacts: dict) -> str:
     if len(contacts) == 0:
         return 'Add some contacts first. Use command "add"'
-    return str.join('\n', map(lambda item: '{:<12}: {}'.format(*item), contacts.items()))
+    return str.join('\n',
+                     map(lambda item: '{:<12}: {}'.format(*item), contacts.items()))
 
 def main():
     contacts = {}
